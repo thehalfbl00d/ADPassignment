@@ -1,0 +1,1 @@
+gcc main.c -o  main 2> error.txt && ./main && rm main

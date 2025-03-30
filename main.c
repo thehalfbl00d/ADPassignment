@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-void mergeSort (char array[], int, int, struct part *);
-void merge(char array[], int low, int mid, int high, struct part *);
+#include <string.h>
 
 struct part
 {
@@ -13,9 +11,9 @@ struct part
     int targetEngineCode;
     int date;
 };
-
-void  generateRandomData(struct part *, struct part * , struct part * , struct part *);
-
+void generateRandomData(struct part *, struct part *, struct part *, struct part *);
+void merge(int array[], int low, int mid, int high);
+void mergeSort(int array[], int low, int high);
 
 
 int main()
@@ -42,26 +40,16 @@ int main()
 
     int array[] = {1,4,3,2,6,4,2,7,1,2,3}; 
 
-    mergeSort(ids, 0, 11 , morningParts);
 
     for (int i = 0; i < 11; i++ ){
         printf("%d ", array[i]);
     }
 
     printf("\n");
-
-    //printf("%d", count++);
-    
-    //printf("%d\n%d\n%s\n", morningParts[0].weight, morningParts[0].line, morningParts[0].batchCode);
-
 }
 
-void generateRandomData( 
-                    struct part *morningParts, 
-                    struct part *eveningParts, 
-                    struct part *afternoonParts, 
-                    struct part *nightParts
-                )
+
+void generateRandomData( struct part *morningParts, struct part *eveningParts, struct part *afternoonParts, struct part *nightParts)
 {
     // seeding time
     srand(time(NULL));
@@ -130,90 +118,53 @@ void generateRandomData(
     } 
 }
 
-
-// our function for merge sort will use id and do comparision based on weight
-void mergeSort(char array[], int low, int high, struct part *parts)
-{
-    
-    // comparison to check if we are at the single elements
-    
-    if (low < high){
-
-        int mid = low + (high - low) / 2;
-
-        // upper part breaking
-        mergeSort(array,low, mid, parts);
-
-        //lower part breaking
-        mergeSort(array, mid + 1, high, parts);
-
-
-        //merging them both together
-        merge(array, low, mid, high,parts);
-    };
-
-}
-
-void merge(char array[], int low, int mid, int high, struct part *parts){
-
+void merge(int array[], int low, int mid, int high) {
     int i, j, k;
-    int l = mid - low + 1;
-    int r = high - mid;
+    int leftSize = mid - low + 1;
+    int rightSize = high - mid;
 
-    int left[l], right[r];
+    int left[leftSize], right[rightSize];
 
-    // making two temp arrays of ids
-    for (i = 0; i < l; i++)
-    {
+    for (i = 0; i < leftSize; i++) {
         left[i] = array[low + i];
     }
-    for (j = 0 ; j < r ; j++)
-    {
+    for (j = 0; j < rightSize; j++) {
         right[j] = array[mid + 1 + j];
     }
-
-    //main logic for merge
 
     i = 0;
     j = 0;
     k = low;
 
+    while (i < leftSize && j < rightSize) {
+        if (left[i] <= right[j]) {
+            array[k] = left[i];
+            i++;
+        } else {
+            array[k] = right[j];
+            j++;
+        }
+        k++;
+    }
 
-    // GOTTA WORK ON THIS PART
-    
-    // while(i < l && j < r)
-    // {   
-    //     // for loop to get the weight of the id
-    //     for (int j = 0; j < 10; i++)
-    //     {
-    //         if (parts[j].batchCode == left[i]){
-    //             int lWeight = parts[j].weight;
-    //         }
-    //         if (parts[j].batchCode == right[j]){}
-    //     }
-        
-    //     if (left[i] <= right[j]){
-    //         array[k] = left[i];
-    //         i++;
-    //     } else{
-    //         array[k] = right[j];
-    //         j++;
-    //     }
-    //     k++;
-    // }
-
-    //copying the leftovers
-    while(i < l){
+    while (i < leftSize) {
         array[k] = left[i];
         i++;
         k++;
     }
 
-    // 
-    while(i < r){
-        array[k] = right[i];
-        i++;
+    while (j < rightSize) {
+        array[k] = right[j];
+        j++;
         k++;
     }
+}
 
+void mergeSort(int array[], int low, int high) {
+    if (low < high) {
+        int mid = low + (high - low) / 2;
+        mergeSort(array, low, mid);
+        mergeSort(array, mid + 1, high);
+        merge(array, low, mid, high);
+    }
 }
