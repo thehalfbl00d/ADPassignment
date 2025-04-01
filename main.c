@@ -21,6 +21,7 @@ void generateRandomData(struct part *, int);
 void merge(char *array[], int low, int mid, int high, struct part *parts, int) ;
 void mergeSort(char *array[], int low, int high, struct part *parts, int);
 int findWeight(char *id, struct part *parts, int );
+int binarySearch(int [], int, int, int);
 
 
 int main()
@@ -225,3 +226,22 @@ int findWeight(char *id, struct part *parts, int len )
     return 0;
 }
 
+int binarySearch(int array[], int find, int low, int high)
+{   
+    if (low > high){
+        return -1;
+    }
+
+    int mid = low + (high - low)/2;
+    if (array[mid] == find)
+    {   
+        return mid;
+    } 
+    if(array[mid] > find)
+    {   
+        high = mid - 1;
+        return binarySearch(array,find,low, high);
+    }
+    
+    return binarySearch(array, find, mid + 1, high);  // Search right
+}
