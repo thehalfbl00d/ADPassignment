@@ -12,10 +12,10 @@ struct part
     int date;
 };
 
-#define Morning 10
-#define Afternoon 10
-#define Evening 10
-#define Night 10
+#define Morning 15
+#define Afternoon 12
+#define Evening 30
+#define Night 20
 
 void generateRandomData(struct part *, int);
 void merge(char *array[], int low, int mid, int high, struct part *parts, int) ;
@@ -103,10 +103,34 @@ int main()
     printf("\n:   The Vans Allocation    :\n");
     for (int i = 0 ; i < Morning + Afternoon + Evening + Night; i++)
     {   
-        if(i % 10 == 0){
-            printf("\nVans %d: ", i/10);
+        if (i < Morning)
+        {
+            if (i == 0){
+                printf("\nVan 1: ");
+            }
+            printf("%s ", allids[i]);
+        } 
+        else if (Morning <= i && i < (Afternoon + Morning))
+        {
+            if (i == Morning){
+                printf("\nVan 2: ");
+            }
+            printf("%s ", allids[i]); 
         }
-        printf("%s ", allids[i]);
+        else if ((Afternoon + Morning) <= i && i < (Evening + Afternoon + Morning))
+        {
+            if (i == (Afternoon + Morning)){
+                printf("\nVan 3: ");
+            }
+            printf("%s ", allids[i]);
+        }
+        else if ((Evening + Afternoon + Morning) <= i && i < (Night + Morning+ Afternoon + Evening))
+        {
+            if (i == (Evening + Afternoon + Morning)){
+                printf("\nVan 4: ");
+            }
+            printf("%s ", allids[i]);
+        }
     }
     printf("\n\n");
 
@@ -143,7 +167,7 @@ int main()
         }
     }
 
-    printf("\nThanks for using my Software");
+    printf("\nThanks for using my Software\n");
 };
 
 void generateRandomData( struct part *Parts, int len)
@@ -160,7 +184,7 @@ void generateRandomData( struct part *Parts, int len)
         int a = rand();
         
         //generating random weight
-        Parts[i].weight = m % 100;
+        Parts[i].weight = m % 1000;
 
         //generatingrandomline
         Parts[i].line = m % 4 + 1;
@@ -264,7 +288,7 @@ int findWeight(char *id, struct part *parts, int len )
 
 int binarySearch(char *ids[], int find, int low, int high, struct part *all)
 {   
-    if (low <= high)
+    if (low < high)
     {   
         int mid = low + (high - low)/2;
         int midWeight = findWeight(ids[mid], all, Afternoon + Morning + Evening + Night);
