@@ -21,7 +21,7 @@ void generateRandomData(struct part *, int);
 void merge(char *array[], int low, int mid, int high, struct part *parts, int) ;
 void mergeSort(char *array[], int low, int high, struct part *parts, int);
 int findWeight(char *id, struct part *parts, int );
-int binarySearch(int [], int, int, int);
+int binarySearch(char *ids[], int find, int low, int high, struct part *all);
 
 
 int main()
@@ -76,36 +76,74 @@ int main()
             all[i].targetEngineCode =  nightParts[i - (Morning + Afternoon + Evening)].targetEngineCode;
         }
     }
-
     
-
-    printf("All ids:  ");
-
+    
+    // printing all ids
+    printf("\nAll ids:  ");
     for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
     {
         printf("%s ",all[i].batchCode);
     }
+    printf("\n");
 
+    //printing all weight
     printf("\nAll weight:  ");
-
     for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
     {
         printf("%d ",all[i].weight);
     }
+    printf("\n");
 
-    printf("\nSorted Batch Code: ");
+    
+
+    //sorting weights
     mergeSort(allids,0,Morning + Afternoon + Evening + Night - 1,all, Morning + Afternoon + Evening + Night);
+
+    //printing vans allocation
+    printf("\n:   The Vans Allocation    :\n");
+    for (int i = 0 ; i < Morning + Afternoon + Evening + Night; i++)
+    {   
+        if(i % 10 == 0){
+            printf("\nVans %d: ", i/10);
+        }
+        printf("%s ", allids[i]);
+    }
+    printf("\n\n");
+
+    //printing all sorted batch
+    printf("\nSorted Batch Code: ");
     for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
     {
         printf("%s ",allids[i]);
     }
+    printf("\n");
 
+    //printing sorted weights
     printf("\nSorted weight:  ");
-
     for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
     {
         printf("%d ",findWeight(allids[i], all, Morning + Afternoon + Evening + Night));
     }
+
+    // making a menu for looking
+    int inMenu = 1;
+    while(inMenu)
+    {   
+        int option;
+        printf("\n\nNumber looking for\nPress -1 to exit : ");
+        scanf("%d", &option);
+
+        if (option == -1)
+        {
+            inMenu = 0;
+        } 
+        else
+        {
+            option = binarySearch(allids,option,0,Morning + Afternoon + Evening + Night, all);
+        }
+    }
+
+    printf("\nThanks for using my Software");
 };
 
 void generateRandomData( struct part *Parts, int len)
@@ -122,7 +160,7 @@ void generateRandomData( struct part *Parts, int len)
         int a = rand();
         
         //generating random weight
-        Parts[i].weight = m % 10;
+        Parts[i].weight = m % 100;
 
         //generatingrandomline
         Parts[i].line = m % 4 + 1;
@@ -149,9 +187,6 @@ void generateRandomData( struct part *Parts, int len)
         {
             Parts[t].targetEngineCode = m * n;
         }
-
-        
-        
     } 
 }
 
@@ -199,6 +234,7 @@ void merge(char *array[], int low, int mid, int high, struct part *parts, int le
         j++;
         k++;
     }  
+
 }
 
 void mergeSort(char *array[], int low, int high, struct part *parts, int len) 
@@ -226,22 +262,37 @@ int findWeight(char *id, struct part *parts, int len )
     return 0;
 }
 
-int binarySearch(int array[], int find, int low, int high)
+int binarySearch(char *ids[], int find, int low, int high, struct part *all)
 {   
-    if (low > high){
+    if (low <= high)
+    {   
+        int mid = low + (high - low)/2;
+        int midWeight = findWeight(ids[mid], all, Afternoon + Morning + Evening + Night);
+
+        if ( midWeight == find)
+        {   
+            int weight = findWeight(ids[mid], all, Afternoon + Morning + Evening + Night);
+            int i = 0;
+            while(weight == findWeight(ids[mid - i], all, Afternoon + Morning + Evening + Night) && ((mid - i) >=0 ))
+            {   
+                mid = mid - i;
+                i++;
+            }; 
+            
+            printf("%d found at id %s, at index: %d", midWeight, ids[mid], mid + 1);
+            return mid;
+        } 
+        else if (midWeight > find)
+        {   
+            high = mid - 1;
+            return binarySearch(ids,find,low, mid - 1 , all);
+        }
+        
+        return binarySearch(ids, find, mid + 1, high, all);  // Search right
+    } 
+    else
+    {
+        printf("\nNumber not found!\n");
         return -1;
     }
-
-    int mid = low + (high - low)/2;
-    if (array[mid] == find)
-    {   
-        return mid;
-    } 
-    if(array[mid] > find)
-    {   
-        high = mid - 1;
-        return binarySearch(array,find,low, high);
-    }
-    
-    return binarySearch(array, find, mid + 1, high);  // Search right
 }
