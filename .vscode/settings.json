@@ -2,5 +2,11 @@
     "files.associations": {
         "string.h": "c",
         "time.h": "c"
+    },
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
     }
 }

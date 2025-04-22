@@ -1,3 +1,18 @@
+/*
+Description:    This code generated random data, throws it into struct, 
+                then uses a modded version of mergesort to sort, 
+                which does comparisons based on weights and arrange the ids in an array based on that,
+                now we are finished sorting,
+                to print weights, we use a function which basically goes to the struct and asks for the weight of the id,
+                so now we are making a new array of weight based on this sorted ids array,
+                then we use quick sort for finding weight in the whole meatball of all weights,
+                then we break down all of the weights into 4 vans.
+                I will try to use dma for structs but if you still see this comment, i failed.
+Author: Akshat Pasbola (D24126231)
+Date: idk
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -18,7 +33,7 @@ struct part
 #define Night 20
 
 void generateRandomData(struct part *, int);
-void merge(char *array[], int low, int mid, int high, struct part *parts, int) ;
+void merge(char *array[], int low, int mid, int high, struct part *parts, int);
 void mergeSort(char *array[], int low, int high, struct part *parts, int);
 int findWeight(char *id, struct part *parts, int );
 int binarySearch(char *ids[], int find, int low, int high, struct part *all);
@@ -26,12 +41,16 @@ int binarySearch(char *ids[], int find, int low, int high, struct part *all);
 
 int main()
 {   
+
     // seeding time
     srand(time(NULL));
+
+    //variables
+    int allIDCount = Morning + Afternoon + Evening + Night;
     
     // declaring different time parts
     struct part morningParts[Morning], eveningParts[Evening], afternoonParts[Afternoon], nightParts[Night];
-    struct part all[Morning + Afternoon + Evening + Night];
+    struct part all[allIDCount];
 
     //generating random data
     generateRandomData(morningParts, Morning);
@@ -40,8 +59,8 @@ int main()
     generateRandomData(nightParts, Night);
 
     // making one big id of everything ( works till here) + making a new big struct of all data
-    char *allids[Morning + Afternoon + Evening + Night];
-    for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
+    char *allids[allIDCount];
+    for(int i = 0; i < allIDCount; i++)
     {
         if (i < Morning)
         {
@@ -67,88 +86,95 @@ int main()
             all[i].line = eveningParts[i - (Morning + Afternoon)].line;
             all[i].targetEngineCode =  eveningParts[i - (Morning + Afternoon)].targetEngineCode;
         }
-        else if ((Evening + Afternoon + Morning) <= i && i < (Night + Morning+ Afternoon + Evening))
+        else if ((Evening + Afternoon + Morning) <= i && i < (allIDCount))
         {
-            allids[i] = nightParts[i - (Morning + Afternoon + Evening)].batchCode;
-            strcpy(all[i].batchCode,nightParts[i - (Morning + Afternoon + Evening)].batchCode);
-            all[i].weight = nightParts[i - (Morning + Afternoon + Evening)].weight;
-            all[i].line = nightParts[i - (Morning + Afternoon + Evening)].line;
-            all[i].targetEngineCode =  nightParts[i - (Morning + Afternoon + Evening)].targetEngineCode;
+            allids[i] = nightParts[i - (allIDCount - Night)].batchCode;
+            strcpy(all[i].batchCode,nightParts[i - (allIDCount - Night)].batchCode);
+            all[i].weight = nightParts[i - (allIDCount - Night)].weight;
+            all[i].line = nightParts[i - (allIDCount - Night)].line;
+            all[i].targetEngineCode =  nightParts[i - (allIDCount - Night)].targetEngineCode;
         }
     }
     
     
     // printing all ids
-    printf("\nAll ids:  ");
-    for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
+    printf("\n%19s",":   All IDS   :  \n\n");
+    for(int i = 0; i < allIDCount; i++)
     {
         printf("%s ",all[i].batchCode);
     }
     printf("\n");
 
     //printing all weight
-    printf("\nAll weight:  ");
-    for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
+    printf("\n%20s",":   All Weights   :  \n\n");
+    for(int i = 0; i < allIDCount; i++)
     {
         printf("%d ",all[i].weight);
     }
     printf("\n");
 
     
-
+    
     //sorting weights
-    mergeSort(allids,0,Morning + Afternoon + Evening + Night - 1,all, Morning + Afternoon + Evening + Night);
+    //allids is an array of pointers, i.e. why we didnt pass it as address
+    mergeSort(allids,0,allIDCount - 1,all, allIDCount);
 
-    //printing vans allocation
-    printf("\n:   The Vans Allocation    :\n");
-    for (int i = 0 ; i < Morning + Afternoon + Evening + Night; i++)
-    {   
+    //TASK 2
+    printf("\n\n:<------TASK 1------>:\n\n");
+    for (int i = 0; i < allIDCount; i++)
+    {
         if (i < Morning)
         {
             if (i == 0){
-                printf("\nVan 1: ");
+                printf("\nMorning IDS: \n");
             }
             printf("%s ", allids[i]);
         } 
         else if (Morning <= i && i < (Afternoon + Morning))
         {
             if (i == Morning){
-                printf("\nVan 2: ");
+                printf("\n\nAfternoon IDS: \n");
             }
             printf("%s ", allids[i]); 
         }
-        else if ((Afternoon + Morning) <= i && i < (Evening + Afternoon + Morning))
+        else if ((Afternoon + Morning) <= i && i < (allIDCount - Night))
         {
-            if (i == (Afternoon + Morning)){
-                printf("\nVan 3: ");
+            if (i == (Afternoon + Morning))
+            {
+                printf("\n\nEvening IDS: \n");
             }
             printf("%s ", allids[i]);
         }
-        else if ((Evening + Afternoon + Morning) <= i && i < (Night + Morning+ Afternoon + Evening))
+        else if ((allIDCount - Night) <= i && i < (allIDCount))
         {
             if (i == (Evening + Afternoon + Morning)){
-                printf("\nVan 4: ");
+                printf("\n\nNight IDS: \n");
             }
             printf("%s ", allids[i]);
         }
     }
-    printf("\n\n");
 
+
+    // TASK 2 START //
+    printf("\n\n:<------TASK 2------>:\n\n");
     //printing all sorted batch
-    printf("\nSorted Batch Code: ");
-    for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
+    printf("\n:     Sorted Batch Code     : \n\n");
+    for(int i = 0; i < allIDCount; i++)
     {
         printf("%s ",allids[i]);
     }
     printf("\n");
 
     //printing sorted weights
-    printf("\nSorted weight:  ");
-    for(int i = 0; i < Morning + Afternoon + Evening + Night; i++)
+    printf("\n:     Sorted weight     :  \n\n");
+    for(int i = 0; i <allIDCount; i++)
     {
-        printf("%d ",findWeight(allids[i], all, Morning + Afternoon + Evening + Night));
+        printf("%d ",findWeight(allids[i], all,allIDCount));
     }
 
+    // TASK 2 END //
+    // TASK 3 STARTS //
+    printf("\n\n:<------TASK 3------>:");
     // making a menu for looking
     int inMenu = 1;
     while(inMenu)
@@ -163,9 +189,31 @@ int main()
         } 
         else
         {
-            option = binarySearch(allids,option,0,Morning + Afternoon + Evening + Night, all);
+            binarySearch(allids,option,0,allIDCount, all);
         }
     }
+
+    //printing vans allocation
+
+    printf("\n\n<-----TASK 4----->");
+    printf("\n\n<-----VAN ALLOCATION----->"); 
+    int numberofvans = 4;
+    int products_in_each_van = allIDCount / 4;
+    int extras = allIDCount % 4;
+    int van = 0;
+
+    for (int i = 0 ; i < allIDCount; i++)
+    {   
+        if(i % (products_in_each_van + 1) == 0)
+        {
+            printf("\nVan %d: ", van+=1);
+        }
+        printf("%s ", allids[i]);
+
+    }
+
+
+    printf("\n\n");
 
     printf("\nThanks for using my Software\n");
 };
